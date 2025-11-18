@@ -1,0 +1,19 @@
+<h2><%= @symbol %></h2>
+
+<div
+  data-controller="stock-chart"
+  data-stock-chart-symbol-value="<%= @symbol %>"
+  data-stock-chart-refresh-interval-value="5000">
+
+  <!-- 🟢 여기: 가격 표시 타깃 -->
+  <div
+    data-stock-chart-target="priceInfo"
+    style="margin-bottom: 12px;">
+  </div>
+
+  <!-- 차트 영역 -->
+  <div
+    data-stock-chart-target="chart"
+    style="width: 100%; max-width: 900px; height: 450px;">
+  </div>
+</div>
