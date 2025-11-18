@@ -61,3 +61,5 @@ end
 gem "faraday", "~> 2.14"
 
 gem "jsbundling-rails", "~> 1.3"
+
+gem "dotenv-rails"

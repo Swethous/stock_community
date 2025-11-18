@@ -1,0 +1,35 @@
+# Dockerfile.dev (로컬 개발용)
+FROM ruby:3.3
+
+ENV LANG=C.UTF-8
+ENV TZ=Asia/Tokyo
+
+# 개발에 필요한 패키지 + Node + npm
+RUN apt-get update -qq && \
+    apt-get install -y \
+      curl \
+      build-essential \
+      libpq-dev \
+      postgresql-client \
+      nodejs \
+      npm \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Gem 설치
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+# npm 패키지 설치
+COPY package.json package-lock.json ./
+RUN npm install
+
+# 나머지 앱 코드 복사
+COPY . .
+
+# ⛔️ assets:precompile 안 함 (개발용이라 필요 X)
+# RUN bundle exec rails assets:precompile
+
+# ✅ 개발용 서버 실행 (bin/dev가 있으면 이게 제일 편함)
+CMD ["bash", "-lc", "./bin/dev"]
