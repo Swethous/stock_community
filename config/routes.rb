@@ -1,9 +1,8 @@
 Rails.application.routes.draw do
-  # 예시: 루트에서 바로 차트 페이지 보여주고 싶으면
-  root "stocks#show"
-
-  resource :stock, only: [:show] do
-    # GET /stock/chart_data.json
-    get :chart_data, defaults: { format: :json }
+  namespace :api do
+    namespace :v1 do
+      get "health", to: "health#index"
+      # 나중에 여기 아래에 stocks, posts 등 추가
+    end
   end
 end
