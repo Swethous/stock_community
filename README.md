@@ -90,7 +90,7 @@ React + Lightweight Charts + キャッシュ構造により、
 ---
 
 ### ✔ 本リリース（拡張）
-- リアルタイムコメント（WebSocket or SSE）  
+- リアルタイムコメント（WebSocket）  
 - オートコンプリート検索
 - SEO 改善  
 - ニュース API 連携  
