@@ -1,5 +1,8 @@
 # 📘 株式コミュニティサービス企画案（README）
 
+## Runteq 提出用
+- [画面遷移図](README_画面遷移図.md)
+
 ## Language
 - 🇯🇵 [日本語 README](README.md)
 - 🇰🇷 [한국어 README](README_KR.md)
