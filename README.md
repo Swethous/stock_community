@@ -1,5 +1,9 @@
 # 📘 株式コミュニティサービス企画案（README）
 
+##  確認用
+- [画面遷移図](README_画面遷移図.md)
+- [ERD](README_erd.md)
+
 ## Language
 - 🇯🇵 [日本語 README](README.md)
 - 🇰🇷 [한국어 README](README_KR.md)
