@@ -1,4 +1,4 @@
-### ER図
+### ERD図
 https://gyazo.com/82c37820fdbee48e457fa7a4f754d988
 
 ---
