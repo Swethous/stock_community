@@ -24,3 +24,6 @@ console_command = '/rails/bin/rails console'
 
 [env]
   RAILS_ENV = "production"
+
+[deploy]
+  release_command = "bin/rails db:migrate"

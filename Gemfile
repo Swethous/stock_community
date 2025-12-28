@@ -11,6 +11,9 @@ gem "jwt"                   # 로그인 토큰 발급용 (추가 추천)
 gem "rack-cors"             # CORS 허용 (React 접근)
 gem "bootsnap", require: false
 
+gem "faraday-cookie_jar", "~> 0.0.8"
+gem "faraday-follow_redirects", "~> 0.3"  # 쿠키 지원용 Faraday 미들웨어
+
 group :development, :test do
   gem "debug", require: "debug/prelude"
   gem "brakeman", require: false

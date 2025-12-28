@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_06_071509) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_28_065253) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,7 +42,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_06_071509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["post_id", "created_at"], name: "index_comments_on_post_id_and_created_at"
-    t.index ["post_id"], name: "index_comments_on_post_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
@@ -66,34 +65,76 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_06_071509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["stock_id", "created_at"], name: "index_posts_on_stock_id_and_created_at"
-    t.index ["stock_id"], name: "index_posts_on_stock_id"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
   create_table "price_candles", force: :cascade do |t|
     t.bigint "stock_id", null: false
-    t.datetime "time", null: false
+    t.datetime "ts", null: false
     t.string "interval", limit: 20, null: false
-    t.decimal "open", precision: 15, scale: 4
-    t.decimal "high", precision: 15, scale: 4
-    t.decimal "low", precision: 15, scale: 4
-    t.decimal "close", precision: 15, scale: 4
-    t.bigint "volume"
+    t.decimal "open", precision: 18, scale: 6
+    t.decimal "high", precision: 18, scale: 6
+    t.decimal "low", precision: 18, scale: 6
+    t.decimal "close", precision: 18, scale: 6
+    t.bigint "volume", default: 0, null: false
+    t.datetime "fetched_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["stock_id", "interval", "time"], name: "index_price_candles_on_stock_id_and_interval_and_time", unique: true
+    t.index ["stock_id", "interval", "ts"], name: "index_price_candles_on_stock_id_interval_ts_unique", unique: true
     t.index ["stock_id"], name: "index_price_candles_on_stock_id"
   end
 
+  create_table "ranking_rows", force: :cascade do |t|
+    t.string "market", limit: 10, null: false
+    t.string "kind", limit: 30, null: false
+    t.integer "rank", null: false
+    t.bigint "stock_id", null: false
+    t.datetime "as_of"
+    t.datetime "fetched_at", null: false
+    t.jsonb "extra", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["market", "kind", "rank"], name: "index_ranking_rows_on_market_kind_rank", unique: true
+    t.index ["market", "kind"], name: "index_ranking_rows_on_market_kind"
+    t.index ["stock_id"], name: "index_ranking_rows_on_stock_id"
+  end
+
+  create_table "stock_snapshots", force: :cascade do |t|
+    t.bigint "stock_id", null: false
+    t.decimal "price", precision: 18, scale: 6
+    t.decimal "prev_close", precision: 18, scale: 6
+    t.decimal "change_percent", precision: 9, scale: 4
+    t.bigint "market_cap"
+    t.string "currency", limit: 10
+    t.datetime "as_of"
+    t.datetime "fetched_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["market_cap"], name: "index_stock_snapshots_on_market_cap"
+    t.index ["stock_id"], name: "index_stock_snapshots_on_stock_id", unique: true
+  end
+
   create_table "stocks", force: :cascade do |t|
-    t.string "symbol", limit: 30, null: false
+    t.string "yahoo_symbol", limit: 30, null: false
     t.string "name", limit: 250
     t.string "name_kr", limit: 250
     t.string "market", limit: 250
     t.string "sector", limit: 250
+    t.boolean "is_core", default: false, null: false
+    t.boolean "is_active", default: true, null: false
+    t.integer "sort_order", default: 0, null: false
+    t.boolean "sparkline_enabled", default: false, null: false
+    t.string "country", limit: 10, default: "UNKNOWN", null: false
+    t.datetime "last_seen_at"
+    t.string "currency", limit: 10
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["symbol"], name: "index_stocks_on_symbol", unique: true
+    t.index ["country"], name: "index_stocks_on_country"
+    t.index ["currency"], name: "index_stocks_on_currency"
+    t.index ["is_core", "sort_order"], name: "index_stocks_on_is_core_and_sort_order"
+    t.index ["last_seen_at"], name: "index_stocks_on_last_seen_at"
+    t.index ["sparkline_enabled"], name: "index_stocks_on_sparkline_enabled"
+    t.index ["yahoo_symbol"], name: "index_stocks_on_yahoo_symbol", unique: true
   end
 
   create_table "users", force: :cascade do |t|
@@ -101,9 +142,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_06_071509) do
     t.string "name"
     t.string "avatar_url", limit: 300
     t.string "role", limit: 30
+    t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "password_digest", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
@@ -118,4 +159,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_06_071509) do
   add_foreign_key "posts", "stocks"
   add_foreign_key "posts", "users"
   add_foreign_key "price_candles", "stocks"
+  add_foreign_key "ranking_rows", "stocks"
+  add_foreign_key "stock_snapshots", "stocks"
 end

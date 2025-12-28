@@ -14,10 +14,20 @@ Rails.application.routes.draw do
       post   "login",  to: "sessions#create"
       delete "logout", to: "sessions#destroy"
       get    "me",     to: "users#me"
-      post "signup", to: "registrations#create"
+      post "register", to: "registrations#create"
 
       # 헬스 체크
       get "health", to: "health#index"
+
+      # 주식 차트 legacy 라우트
+      namespace :charts do
+        get "indices/main", to: "indices#main"
+
+        get "stocks", to: "stocks#show"
+      end
+
+      # 주식 차트 신규 라우트
+      get "sparklines", to: "sparklines#index"
 
       # TODO: 이후에 게시글, 댓글, 북마크 등 라우트 추가
       # resources :posts
