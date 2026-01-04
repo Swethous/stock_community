@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  # (선택) 루트에 간단한 JSON 응답 걸어두기
+  # todo
+  # 1. 주식상세페이지 차트 로드 실패시. 심볼이 없다고 간주. 
   root to: proc {
     [
       200,
@@ -34,14 +35,21 @@ Rails.application.routes.draw do
           to: "charts#show",
           constraints: { symbol: /[^\/]+/ },
           format: false
-      # TODO: 이후에 게시글, 댓글, 북마크 등 라우트 추가
-      resources :stocks, only: [] do
-        resources :posts, only: [:index, :create, :show]
+      # 주식 상세페이지 포스트&댓글
+      resources :stocks, param: :symbol, only: [] do
+        resources :posts, only: [:index, :create]
       end
+
       resources :posts, only: [:update, :destroy] do
-      # resources :posts
-      # resources :comments
-      # resources :bookmarks
+        resources :comments, only: [:index, :create]
+
+        resource :like, only: [:create, :destroy], controller: "post_likes"
+      end
+
+      resources :comments, only: [:update, :destroy] do
+        resource :like, only: [:create, :destroy], controller: "comment_likes"
+      end
+
     end
   end
 end
