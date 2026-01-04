@@ -22,14 +22,23 @@ Rails.application.routes.draw do
       # 주식 차트 legacy 라우트
       namespace :charts do
         get "indices/main", to: "indices#main"
-
         get "stocks", to: "stocks#show"
       end
 
       # 주식 차트 신규 라우트
       get "sparklines", to: "sparklines#index"
 
+      # 주식 상세페이지 차트
+      # ex: api/v1/stocks/:AMXP/chart?period=day&interval=5m
+      get "stocks/:symbol/chart",
+          to: "charts#show",
+          constraints: { symbol: /[^\/]+/ },
+          format: false
       # TODO: 이후에 게시글, 댓글, 북마크 등 라우트 추가
+      resources :stocks, only: [] do
+        resources :posts, only: [:index, :create, :show]
+      end
+      resources :posts, only: [:update, :destroy] do
       # resources :posts
       # resources :comments
       # resources :bookmarks
