@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   before_create :set_default_role
 
+  has_many :posts, dependent: :destroy
+
   has_secure_password
 
   # =========================
