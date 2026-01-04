@@ -1,12 +1,11 @@
-# app/controllers/api/v1/health_controller.rb
+# app/controllers/api/v1/posts_controller.rb
 class Api::V1::PostsController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index]
-
   before_action :set_post, only: [:update, :destroy]
 
-  # GET /api/v1/stocks/:stock_id/posts
+  # GET /api/v1/stocks/:symbol/posts
   def index
-    stock = Stock.find(params[:stock_id])
+    stock = find_or_create_stock!(params[:stock_symbol])
 
     posts = Post.includes(:user) # n+1 문제 해결 관계이름적기
                 .where(stock_id: stock.id)
@@ -16,9 +15,9 @@ class Api::V1::PostsController < ApplicationController
     render json: posts.map { |p| post_json(p) }
   end
 
-  # POST /api/v1/stocks/:stock_id/posts
+  # POST /api/v1/stocks/:symbol/posts
   def create
-    stock = Stock.find(params[:stock_id])
+    stock = find_or_create_stock!(params[:stock_symbol])
 
     post = current_user.posts.new(post_params)
     post.stock = stock # 알아서 stock_id 들어감
@@ -66,6 +65,16 @@ class Api::V1::PostsController < ApplicationController
   def post_params
     params.require(:post).permit(:body, :image_url)
   end
+
+    def find_or_create_stock!(raw_symbol)
+        symbol = raw_symbol.to_s.strip.upcase
+        raise ActionController::BadRequest, "Invalid symbol" unless symbol.match?(/\A[A-Z0-9.\-]+\z/)
+
+        Stock.find_or_create_by!(yahoo_symbol: symbol).tap do |s|
+            s.update_column(:last_seen_at, Time.current) # optional
+        end
+    end
+
 
   def post_json(post)
     {
